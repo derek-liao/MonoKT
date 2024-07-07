@@ -15,3 +15,8 @@ Please use the following script to run the DisKT model:
 ```
 CUDA_VISIBLE_DEVICES=0 python main.py --model_name diskt --data_name algebra05
 ```
+
+Please use the following script to run the bias experiment:
+```
+CUDA_VISIBLE_DEVICES=0 python main.py --model_name diskt --data_name ednet_high --test_name ednet_low --bias True
+```

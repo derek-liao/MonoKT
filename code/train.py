@@ -177,16 +177,7 @@ def model_train(
     model.load_state_dict(checkpoint["model_state_dict"])
 
     total_preds, total_trues = [], []
-    # total_q_embeds, total_qr_embeds = [], []
     # # evaluation on test dataset
-    from collections import defaultdict
-    true_q, false_q = defaultdict(int), defaultdict(int)
-    # from collections import defaultdict
-    # skill_correct = defaultdict(int)
-    # skill_correct_all = defaultdict(int)
-    # skill_count = defaultdict(int)
-    # skill_pred = defaultdict(int)
-    # skill_sum = defaultdict(int)
     if bias:
         from collections import defaultdict
         skill_count = defaultdict(int)

@@ -82,10 +82,10 @@ def main(config):
 
     kfold = KFold(n_splits=5, shuffle=True, random_state=seed)
 
-    if bias and (data_name == 'ednet_low2' or data_name == 'ednet_medium2' or data_name == 'ednet_high2'):
-        df_path_low = os.path.join(os.path.join(dataset_path, 'ednet_low2'), "preprocessed_df.csv")
-        df_path_medium = os.path.join(os.path.join(dataset_path, 'ednet_medium2'), "preprocessed_df.csv")
-        df_path_high = os.path.join(os.path.join(dataset_path, 'ednet_high2'), "preprocessed_df.csv")
+    if bias and (data_name == 'ednet_low' or data_name == 'ednet_medium' or data_name == 'ednet_high'):
+        df_path_low = os.path.join(os.path.join(dataset_path, 'ednet_low'), "preprocessed_df.csv")
+        df_path_medium = os.path.join(os.path.join(dataset_path, 'ednet_medium'), "preprocessed_df.csv")
+        df_path_high = os.path.join(os.path.join(dataset_path, 'ednet_high'), "preprocessed_df.csv")
         df_low = pd.read_csv(df_path_low, sep="\t")
         df_medium = pd.read_csv(df_path_medium, sep="\t")
         df_high = pd.read_csv(df_path_high, sep="\t")
@@ -106,10 +106,10 @@ def main(config):
         
         users = users_low
         df = df_low
-        if data_name == 'ednet_medium2':
+        if data_name == 'ednet_medium':
             users = users_medium
             df = df_medium
-        if data_name == 'ednet_high2':
+        if data_name == 'ednet_high':
             users = users_high
             df = df_high
         
@@ -218,7 +218,7 @@ def main(config):
                 num_questions = 0
             model = DTransformer(num_skills, num_questions, **model_config)
 
-        if bias == False or not (data_name == 'ednet_low2' or data_name == 'ednet_medium2' or data_name == 'ednet_high2'):
+        if bias == False or not (data_name == 'ednet_low' or data_name == 'ednet_medium' or data_name == 'ednet_high'):
             train_users = users[train_ids]
             np.random.shuffle(train_users)
             offset = int(len(train_ids) * 0.9)
@@ -344,7 +344,7 @@ def main(config):
             n_gpu,
             bias,
         )
-        if bias and (data_name == 'ednet_low2' or data_name == 'ednet_medium2' or data_name == 'ednet_high2'):
+        if bias and (data_name == 'ednet_low' or data_name == 'ednet_medium' or data_name == 'ednet_high'):
             import sys
             sys.exit()
 

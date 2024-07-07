@@ -836,7 +836,7 @@ def prepare_sampled_ednet(min_user_inter_num, kc_col_name, remove_nan_skills, bi
         skill_df.to_csv(os.path.join(data_path, "preprocessed_df.csv"), sep="\t", index=False)
     else:
         for i in ['low', 'medium', 'high']:
-            data_path = os.path.join(BASE_PATH, f"ednet_{i}2/")
+            data_path = os.path.join(BASE_PATH, f"ednet_{i}/")
             df_i = df[df['tag'] == i]
             skill_df_i = skill_df[skill_df['tag'] == i]
             df_i = pd.concat([u_df_i for _, u_df_i in df_i.groupby("user_id")])
@@ -856,7 +856,7 @@ def prepare_sampled_ednet(min_user_inter_num, kc_col_name, remove_nan_skills, bi
             print("# Interactions: {}".format(len(skill_df_i)))
         skill_df = skill_df[["user_id", "item_id", "timestamp", "correct", "skill_id"]]
         skill_df.reset_index(inplace=True, drop=True)
-        data_path=os.path.join(BASE_PATH, f"ednet_all2/")
+        data_path=os.path.join(BASE_PATH, f"ednet_all/")
         skill_df.to_csv(os.path.join(data_path, "preprocessed_df.csv"), sep="\t", index=False)
 
 
