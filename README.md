@@ -1,6 +1,6 @@
 # 🔥DisKT: Disentangled Knowledge Tracing for Alleviating Cognitive Bias (WWW2025 submitted)
 
-PyTorch implementation of DisKT
+PyTorch implementation of [DisKT](https://openreview.net/pdf?id=z13UqeDT39)
 
 ## 🌟Data and Data Preprocessing
 
