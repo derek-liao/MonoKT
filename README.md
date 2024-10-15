@@ -31,6 +31,7 @@ The statistics of the 11 datasets after processing are as follows:
 | database  | 5,488     | 3,388      | 291       | 291        | 990,468       |
 | spanish   | 182       | 409        | 221       | 221        | 578,726       |
 | slepemapy | 5,000     | 2,723      | 1,391     | 1,391      | 625,523       |
+
 **Table1: Statistics of 11 datasets. "#concepts*" denotes the total number of concepts after converting multiple concepts into a new concept.**
 
 ## ➡️Quick Start
