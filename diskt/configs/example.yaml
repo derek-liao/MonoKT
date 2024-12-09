@@ -5,6 +5,20 @@ seed: 12405
 bias: False
 test_name: 'low'
 
+mamba4kt_config:
+  embedding_size: 64
+  num_blocks: 2
+  num_attn_heads: 8
+  d_state: 32
+  d_conv: 4
+  expand: 2
+  dropout: 0.05
+
+mikt_config:
+  state_d: 64
+  embedding_size: 64
+  dropout: 0.05
+
 dtransformer_config:
   embedding_size: 64
   d_ff: 1024

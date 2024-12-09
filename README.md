@@ -45,12 +45,13 @@ conda create -n diskt python=3.10.13
 conda activate diskt
 pip install -r requirements.txt 
 ```
+Specially, Mamba requires a different CUDA version, please strictly follow the installation instructions for [Mamba](https://github.com/state-spaces/mamba) as provided in its respective GitHub repository. Downloading the correct CUDA packages is crucial.
 ### Training & Testing
 
 Our model experiments are conducted on two NVIDIA RTX 3090 24GB GPUs. You can execute it directly using the following commands:
 
 ```python
-CUDA_VISIBLE_DEVICES=0 python main.py --model_name [diskt, dkt, dkvmn, skvmn, deep_irt, gkt, sakt, akt, atkt, cl4kt, corekt, dtransformer, simplekt, folibikt, sparsekt] --data_name [assist09, algebra05, algebra06, statics, ednet, prob, comp, linux ,database, spanish, slepemapy]
+CUDA_VISIBLE_DEVICES=0 python main.py --model_name [diskt, dkt, dkvmn, skvmn, deep_irt, gkt, sakt, akt, atkt, cl4kt, corekt, dtransformer, simplekt, folibikt, sparsekt, MIKT] --data_name [assist09, algebra05, algebra06, statics, ednet, prob, comp, linux ,database, spanish, slepemapy]
 ```
 
 Please use the following script to run the bias experiment:

@@ -29,6 +29,8 @@ from models.deep_irt import DeepIRT
 from models.sparsekt import sparseKT
 from models.gkt import GKT
 from models.gkt_utils import get_gkt_graph
+from models.mikt import MIKT
+from models.mamba4kt import Mamba4KT
 from train import model_train
 from sklearn.model_selection import KFold
 from datetime import datetime, timedelta
@@ -217,6 +219,15 @@ def main(config):
             if data_name in ["statics", "assistments15"]:
                 num_questions = 0
             model = DTransformer(num_skills, num_questions, **model_config)
+        elif model_name == 'mikt':
+            model_config = config.mikt_config
+            pro2skill = torch.zeros((num_questions, num_skills)).to(device)
+            for (x, y) in zip(df["item_id"].tolist(), df["skill_id"].tolist()):
+                pro2skill[x][y]=1
+            model = MIKT(num_skills, num_questions, seq_len, pro2skill, **model_config)
+        elif model_name == 'mamba4kt':
+            model_config = config.mamba4kt_config
+            model = Mamba4KT(num_skills, num_questions, **model_config)
 
         if bias == False or not (data_name == 'ednet_low' or data_name == 'ednet_medium' or data_name == 'ednet_high'):
             train_users = users[train_ids]
@@ -503,6 +514,12 @@ if __name__ == "__main__":
     elif args.model_name == 'dtransformer':  # dtransformer
         cfg.dtransformer_config.dropout = args.dropout
         cfg.dtransformer_config.embedding_size = args.embedding_size
+    elif args.model_name == 'mikt':  # mikt
+        cfg.mikt_config.state_d = args.state_d
+        cfg.mikt_config.dropout = args.dropout
+        cfg.mikt_config.embedding_size = args.embedding_size
+    elif args.model_name == 'mamba4kt':  # mamba4kt
+        cfg.mamba4kt_config.dropout = args.dropout
 
 
     cfg.freeze()
