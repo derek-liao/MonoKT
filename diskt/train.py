@@ -22,7 +22,6 @@ def model_train(
     test_loader,
     config,
     n_gpu,
-    bias=False,
     early_stop=True,
 ):
     train_losses = []
@@ -178,16 +177,6 @@ def model_train(
 
     total_preds, total_trues = [], []
     # # evaluation on test dataset
-    if bias:
-        from collections import defaultdict
-        skill_count = defaultdict(int)
-        skill_pred = defaultdict(int)
-        skill_true = defaultdict(int)
-
-        skill_under = defaultdict(int)
-        skill_over = defaultdict(int)
-        skill_under_count = defaultdict(int)
-        skill_over_count = defaultdict(int)
 
     with torch.no_grad():
         for batch in test_loader:
@@ -213,74 +202,19 @@ def model_train(
             total_preds.append(pred)
             total_trues.append(true)
 
-            # bias only Deep-IRT CoreKT FoLiBiKT sparseKT
-            if bias:
-                skill = batch['skills'][:, 1:].flatten()
-                skill = skill[mask]
-                pred = pred.to('cpu').tolist()
-                true = true.to('cpu').tolist()
-                skill = skill.to('cpu').tolist()
-
-                
-                for s, p, t in zip(skill, pred, true):
-                    if (p < 0.5) == t:
-                        skill_count[s] += 1
-                        skill_pred[s] += p
-                        skill_true[s] += t
-                        if t == 1:
-                            skill_under[s] += p
-                            skill_under_count[s] += 1
-                        else:
-                            skill_over[s] += p
-                            skill_over_count[s] += 1
             
-
-        if bias:
-            skill_difficulty = {
-                s: skill_true[s] / float(skill_count[s]) for s in skill_true
-            }
-
-            skill_pred_difficulty = {
-                s: skill_pred[s] / float(skill_count[s]) for s in skill_pred
-            }
-            difficulty_list = list(skill_difficulty.values())
-            pred_difficulty_list = list(skill_pred_difficulty.values())
-            true_dis = torch.tensor(difficulty_list, dtype=torch.float)
-            pred_dis = torch.tensor(pred_difficulty_list, dtype=torch.float)
-            true_dis = true_dis / true_dis.sum()
-            pred_dis = pred_dis / pred_dis.sum()
-            from torch.distributions import Categorical
-            true_dis = Categorical(probs=true_dis)
-            pred_dis = Categorical(probs=pred_dis)
-            kl_div = torch.distributions.kl_divergence(true_dis, pred_dis)
-
         total_preds = torch.cat(total_preds).squeeze(-1).detach().cpu().numpy()
         total_trues = torch.cat(total_trues).squeeze(-1).detach().cpu().numpy()
 
     auc = roc_auc_score(y_true=total_trues, y_score=total_preds)
     acc = accuracy_score(y_true=total_trues >= 0.5, y_pred=total_preds >= 0.5)
     rmse = np.sqrt(mean_squared_error(y_true=total_trues, y_pred=total_preds))
-    if bias:
-        print(f'model_name: {model_name}, kl_div: {kl_div}')
+
     # else:
     print(
         "Best Model\tTEST AUC: {:.5f}\tTEST ACC: {:5f}\tTEST RMSE: {:5f}".format(
             auc, acc, rmse
         )
     )
-
-    # logs_df = logs_df._append(
-    #     pd.DataFrame(
-    #         {"EarlyStopEpoch": best_epoch, "auc": auc, "acc": acc, "rmse": rmse},
-    #         index=[0],
-    #     ),
-    #     sort=False,
-    # )
-
-    # log_out_path = os.path.join(log_path, data_name)
-    # os.makedirs(log_out_path, exist_ok=True)
-    # logs_df.to_csv(
-    #     os.path.join(log_out_path, "{}_{}.csv".format(model_name, now)), index=False
-    # )
 
     return auc, acc, rmse

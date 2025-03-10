@@ -46,7 +46,6 @@ def main(config):
     dataset_path = config.dataset_path
     data_name = config.data_name
     seed = config.seed
-    bias = config.bias
     test_name = config.test_name
 
     np.random.seed(seed)
@@ -84,69 +83,17 @@ def main(config):
 
     kfold = KFold(n_splits=5, shuffle=True, random_state=seed)
 
-    if bias and (data_name == 'ednet_low' or data_name == 'ednet_medium' or data_name == 'ednet_high'):
-        df_path_low = os.path.join(os.path.join(dataset_path, 'ednet_low'), "preprocessed_df.csv")
-        df_path_medium = os.path.join(os.path.join(dataset_path, 'ednet_medium'), "preprocessed_df.csv")
-        df_path_high = os.path.join(os.path.join(dataset_path, 'ednet_high'), "preprocessed_df.csv")
-        df_low = pd.read_csv(df_path_low, sep="\t")
-        df_medium = pd.read_csv(df_path_medium, sep="\t")
-        df_high = pd.read_csv(df_path_high, sep="\t")
+    df_path = os.path.join(os.path.join(dataset_path, data_name), "preprocessed_df.csv")
+    df = pd.read_csv(df_path, sep="\t")
 
-        print("skill_min", min(df_low["skill_id"].min(), df_medium["skill_id"].min(), df_high["skill_id"].min()))
-        users_low = df_low["user_id"].unique()
-        users_medium = df_medium["user_id"].unique()
-        users_high = df_high["user_id"].unique()
-        df_low["skill_id"] += 1  # zero for padding
-        df_low["item_id"] += 1  # zero for padding
-        df_medium["item_id"] += 1  # zero for padding
-        df_medium["item_id"] += 1  # zero for padding
-        df_high["item_id"] += 1  # zero for padding
-        df_high["item_id"] += 1  # zero for padding
-        num_skills = max(df_low["skill_id"].max(), df_medium["skill_id"].max(), df_high["skill_id"].max()) + 1
-        num_questions = max(df_low["item_id"].max(), df_medium["item_id"].max(), df_high["item_id"].max()) + 1
+    print("skill_min", df["skill_id"].min())
+    users = df["user_id"].unique()
+    df["skill_id"] += 1  # zero for padding
+    df["item_id"] += 1  # zero for padding
+    num_skills = df["skill_id"].max() + 1
+    num_questions = df["item_id"].max() + 1
 
-        
-        users = users_low
-        df = df_low
-        if data_name == 'ednet_medium':
-            users = users_medium
-            df = df_medium
-        if data_name == 'ednet_high':
-            users = users_high
-            df = df_high
-        
-        offset = int(len(users_low) * 0.8)
-        test_users = users_low[offset:]
-        test_df = df_low[df_low["user_id"].isin(test_users)]
-        if test_name == 'medium':
-            test_users = users_medium[offset:]
-            test_df = df_medium[df_medium["user_id"].isin(test_users)]
-        if test_name == 'high':
-            test_users = users_high[offset:]
-            test_df = df_high[df_high["user_id"].isin(test_users)]
-        offset = int(len(users) * 0.8)
-        train_ids = users[:offset]
-        offset = int(len(train_ids) * 0.9)
-
-        valid_users = train_ids[offset:]
-        train_users = train_ids[:offset]
-
-        train_df = df[df["user_id"].isin(train_users)]
-        valid_df = df[df["user_id"].isin(valid_users)]
-
-
-    else:
-        df_path = os.path.join(os.path.join(dataset_path, data_name), "preprocessed_df.csv")
-        df = pd.read_csv(df_path, sep="\t")
-
-        print("skill_min", df["skill_id"].min())
-        users = df["user_id"].unique()
-        df["skill_id"] += 1  # zero for padding
-        df["item_id"] += 1  # zero for padding
-        num_skills = df["skill_id"].max() + 1
-        num_questions = df["item_id"].max() + 1
-
-        np.random.shuffle(users)
+    np.random.shuffle(users)
 
     print("MODEL", model_name)
     print(dataset)
@@ -229,19 +176,18 @@ def main(config):
             model_config = config.mamba4kt_config
             model = Mamba4KT(num_skills, num_questions, **model_config)
 
-        if bias == False or not (data_name == 'ednet_low' or data_name == 'ednet_medium' or data_name == 'ednet_high'):
-            train_users = users[train_ids]
-            np.random.shuffle(train_users)
-            offset = int(len(train_ids) * 0.9)
+        train_users = users[train_ids]
+        np.random.shuffle(train_users)
+        offset = int(len(train_ids) * 0.9)
 
-            valid_users = train_users[offset:]
-            train_users = train_users[:offset]
+        valid_users = train_users[offset:]
+        train_users = train_users[:offset]
 
-            test_users = users[test_ids]
+        test_users = users[test_ids]
 
-            train_df = df[df["user_id"].isin(train_users)]
-            valid_df = df[df["user_id"].isin(valid_users)]
-            test_df = df[df["user_id"].isin(test_users)]
+        train_df = df[df["user_id"].isin(train_users)]
+        valid_df = df[df["user_id"].isin(valid_users)]
+        test_df = df[df["user_id"].isin(test_users)]
 
         
         train_dataset = dataset(train_df, seq_len, num_skills, num_questions)
@@ -353,11 +299,8 @@ def main(config):
             test_loader,
             config,
             n_gpu,
-            bias,
         )
-        if bias and (data_name == 'ednet_low' or data_name == 'ednet_medium' or data_name == 'ednet_high'):
-            import sys
-            sys.exit()
+
 
         test_aucs.append(test_auc)
         test_accs.append(test_acc)
@@ -448,10 +391,6 @@ if __name__ == "__main__":
     parser.add_argument(
         "--state_d", type=int, default=64, help="hidden size"
     )
-    
-    parser.add_argument(
-        "--bias", type=str2bool, default=False, help="bias"
-    )
     parser.add_argument(
         "--test_name", type=str, default='low', help="the possible testsets are in [ednet-low, ednet-medium, ednet-high]"
     )
@@ -464,7 +403,6 @@ if __name__ == "__main__":
     base_cfg = yaml.safe_load(base_cfg_file)
     cfg = CN(base_cfg)
     cfg.set_new_allowed(True)
-    cfg.bias = args.bias
     cfg.test_name = args.test_name
     cfg.model_name = args.model_name
     cfg.data_name = args.data_name

@@ -1,6 +1,17 @@
-# 🔥DisKT: Disentangled Knowledge Tracing for Alleviating Cognitive Bias (WWW2025 submitted)
+# 🔥DisKT: Disentangled Knowledge Tracing for Alleviating Cognitive Bias (WWW2025)
 
-PyTorch implementation of [DisKT](https://openreview.net/pdf?id=z13UqeDT39)
+PyTorch implementation of [DisKT](https://openreview.net/forum?id=z13UqeDT39)
+
+
+<h5 align=center>
+
+[![arXiv](https://img.shields.io/badge/Arxiv-2503.02539-red?logo=arxiv&label=Arxiv&color=red)](https://arxiv.org/abs/2503.02539)
+[![License](https://img.shields.io/badge/Code%20License-MIT%20License-yellow)](https://github.com/zyy-2001/DisKT/blob/master/LICENSE)
+[![Hits](https://hits.seeyoufarm.com/api/count/incr/badge.svg?url=https%3A%2F%2Fgithub.com%2Fzyy-2001%2Fdiskt&count_bg=%2379C83D&title_bg=%23555555&icon=&icon_color=%23E7E7E7&title=Vistors&edge_flat=false)](https://hits.seeyoufarm.com)
+![GitHub Repo stars](https://img.shields.io/github/stars/zyy-2001/DisKT)
+
+</h5>
+
 
 ## 🌟Data and Data Preprocessing
 
@@ -19,7 +30,7 @@ python preprocess_data.py --data_name sampled_slepemapy
 The statistics of the 11 datasets after processing are as follows:
 
 | Datasets  | #students | #questions | #concepts | #concepts* | #interactions |
-|-----------|-----------|------------|-----------|------------|---------------|
+| --------- | --------- | ---------- | --------- | ---------- | ------------- |
 | assist09  | 3,644     | 17,727     | 123       | 150        | 281,890       |
 | algebra05 | 571       | 173,113    | 112       | 271        | 607,014       |
 | algebra06 | 1,138     | 129,263    | 493       | 550        | 1,817,450     |
@@ -34,6 +45,8 @@ The statistics of the 11 datasets after processing are as follows:
 
 **Table1: Statistics of 11 datasets. "#concepts\*" denotes the total number of concepts after converting multiple concepts into a new concept.**
 
+The dataset processed with PTADisc can be found at the [link](https://drive.google.com/file/d/1IFys5t9J2yzOz_KLk86EglnBU2bftEJG/view?usp=sharing).
+
 ## ➡️Quick Start
 
 ### Installation
@@ -45,16 +58,25 @@ conda create -n diskt python=3.10.13
 conda activate diskt
 pip install -r requirements.txt 
 ```
+
 Specially, Mamba requires a different CUDA version, please strictly follow the installation instructions for [Mamba](https://github.com/state-spaces/mamba) as provided in its respective GitHub repository. Downloading the correct CUDA packages is crucial.
+
 ### Training & Testing
 
 Our model experiments are conducted on two NVIDIA RTX 3090 24GB GPUs. You can execute it directly using the following commands:
 
 ```python
-CUDA_VISIBLE_DEVICES=0 python main.py --model_name [diskt, dkt, dkvmn, skvmn, deep_irt, gkt, sakt, akt, atkt, cl4kt, corekt, dtransformer, simplekt, folibikt, sparsekt, MIKT] --data_name [assist09, algebra05, algebra06, statics, ednet, prob, comp, linux ,database, spanish, slepemapy]
+CUDA_VISIBLE_DEVICES=0 python main.py --model_name [diskt, dkt, dkvmn, skvmn, deep_irt, gkt, sakt, akt, atkt, cl4kt, corekt, dtransformer, simplekt, folibikt, sparsekt, mikt] --data_name [assist09, algebra05, algebra06, statics, ednet, prob, sampled_comp, linux ,database, spanish, sampled_slepemapy]
 ```
 
-Please use the following script to run the bias experiment:
-```python
-CUDA_VISIBLE_DEVICES=0 python main.py --model_name [diskt, sparsekt, akt, corekt, deep_irt] --data_name [ednet_low, ednet_medium, ednet_high] --test_name ednet_low --bias True
+
+## 🎈Citation
+If you find our work valuable, we would appreciate your citation: 
+```text
+@article{zhou2025disentangled,
+  title={Disentangled Knowledge Tracing for Alleviating Cognitive Bias},
+  author={Zhou, Yiyun and Lv, Zheqi and Zhang, Shengyu and Chen, Jingyuan},
+  journal={arXiv preprint arXiv:2503.02539},
+  year={2025}
+}
 ```
