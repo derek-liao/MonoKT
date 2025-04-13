@@ -1,0 +1,6 @@
+.vscode/
+src/dataset
+src/saved_model
+src/wandb
+src/logs
+src/__pycache__

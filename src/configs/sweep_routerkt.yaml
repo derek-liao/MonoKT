@@ -1,0 +1,24 @@
+program: run_sweep.py
+method: grid
+metric:
+  name: test_auc
+  goal: maximize
+parameters:
+  model_name:
+    value: routerkt
+  data_name:
+    values: ["algebra05", "bridge06", "assistments09", "slepemapy", "ednet", "prob", "linux", "sampled_comp", "database", "spanish"]
+  num_attn_heads:
+    values: [8]
+  num_shared_heads:
+    values: [1, 2, 3]
+  num_selected_heads:
+    values: [1,2,3]
+  balance_loss_weight:
+    values: [0, 0.0001, 0.001, 0.01, 1]
+  l2:
+    values: [0, 0.01, 1]
+  routing_mode:
+    values: ["dynamic", "query_norm"]
+  separate_qr:
+    values: [true, false] 
