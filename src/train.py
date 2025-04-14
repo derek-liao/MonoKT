@@ -106,7 +106,7 @@ def model_train(
         valid_auc = roc_auc_score(y_true=total_trues, y_score=total_preds)
         
         # Log metrics to wandb
-        if wandb.run is not None and config["train_config"]["log_wandb"]:
+        if config["train_config"]["log_wandb"]:
             wandb.log({
                 "epoch": i,
                 "train_loss": train_loss,
