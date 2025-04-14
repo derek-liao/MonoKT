@@ -201,7 +201,7 @@ qikt_moe_config:
   embedding_size: 64
   dropout: 0.05
   mlp_layer_num: 1
-  num_experts: 5
+  num_experts: 3
   emb_type: 'qaid'
   l2: 1e-5
   num_blocks: 2
@@ -214,7 +214,7 @@ qikt_moe_config:
 
 train_config:
   wl: 0.0
-  log_wandb_fold: True
+  log_wandb: True
   sequence_option: "recent" # early or recent, recent_stack for AKT'
   seq_len: 100
   batch_size: 512

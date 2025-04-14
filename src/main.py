@@ -57,7 +57,7 @@ def main(config):
     test_name = config.test_name
 
     # Initialize wandb if it's not already initialized (direct run from main.py)
-    if wandb.run is None:
+    if wandb.run is None and config.train_config.log_wandb:
         wandb.init(
             project="kt-experiment",
             config={
@@ -350,8 +350,8 @@ def main(config):
         test_accs.append(test_acc)
         test_rmses.append(test_rmse)
         
-        # Log individual fold results to wandb only if log_wandb_fold is True
-        if wandb.run is not None and config.train_config.log_wandb_fold:
+        # Log individual fold results to wandb only if log_wandb is True
+        if wandb.run is None and config.train_config.log_wandb:
             wandb.log({
                 f"fold_{fold}/test_auc": test_auc,
                 f"fold_{fold}/test_acc": test_acc,
@@ -368,7 +368,7 @@ def main(config):
     now = (datetime.now() + timedelta(hours=9)).strftime("%Y%m%d-%H%M%S")  # KST time
 
     # Log final results to wandb
-    if wandb.run is not None:
+    if wandb.run is None and config.train_config.log_wandb:
         wandb.log({
             "test_auc": test_auc,
             "test_acc": test_acc,
@@ -521,5 +521,5 @@ if __name__ == "__main__":
 
     cfg.freeze()
 
-    print(cfg)
+    # print(cfg)
     main(cfg)

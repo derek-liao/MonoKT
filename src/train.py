@@ -106,7 +106,7 @@ def model_train(
         valid_auc = roc_auc_score(y_true=total_trues, y_score=total_preds)
         
         # Log metrics to wandb
-        if wandb.run is not None and config["train_config"]["log_wandb_fold"]:
+        if wandb.run is not None and config["train_config"]["log_wandb"]:
             wandb.log({
                 "epoch": i,
                 "train_loss": train_loss,
@@ -172,14 +172,6 @@ def model_train(
         test_acc = accuracy_score(y_true=total_trues >= 0.5, y_pred=total_preds >= 0.5)
         test_rmse = np.sqrt(mean_squared_error(y_true=total_trues, y_pred=total_preds))
         
-        # Log test metrics to wandb
-        if wandb.run is not None and config["train_config"]["log_wandb_fold"]:
-            wandb.log({
-                "test_auc": test_auc,
-                "test_acc": test_acc,
-                "test_rmse": test_rmse
-            })
-
         print(
             "Fold {}:\t Epoch {}\t\tTRAIN LOSS: {:.5f}\tVALID AUC: {:.5f}\tTEST AUC: {:.5f}".format(
                 fold, i, train_loss, valid_auc, test_auc
