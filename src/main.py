@@ -34,6 +34,7 @@ from models.gkt import GKT
 from models.gkt_utils import get_gkt_graph
 from models.mikt import MIKT
 from models.routerkt import RouterKT
+from models.qikt_moe import QIKTMOE
 # from models.mamba4kt import Mamba4KT
 from train import model_train
 from sklearn.model_selection import KFold
@@ -215,6 +216,9 @@ def main(config):
         elif model_name == 'routerkt':
             model_config = config.routerkt_config
             model = RouterKT(num_skills, num_questions, seq_len, **model_config)
+        elif model_name == 'qiktmoe':
+            model_config = config.qikt_moe_config
+            model = QIKTMOE(num_skills, num_questions, seq_len, **model_config)
 
         train_users = users[train_ids]
         np.random.shuffle(train_users)
@@ -346,8 +350,8 @@ def main(config):
         test_accs.append(test_acc)
         test_rmses.append(test_rmse)
         
-        # Log individual fold results to wandb
-        if wandb.run is not None:
+        # Log individual fold results to wandb only if log_wandb_fold is True
+        if wandb.run is not None and config.train_config.log_wandb_fold:
             wandb.log({
                 f"fold_{fold}/test_auc": test_auc,
                 f"fold_{fold}/test_acc": test_acc,
@@ -508,6 +512,10 @@ if __name__ == "__main__":
         cfg.mikt_config.embedding_size = args.embedding_size
     elif args.model_name == 'routerkt':  # routerkt
         cfg.routerkt_config.dropout = args.dropout
+    elif args.model_name == 'qiktmoe':  # qiktmoe
+        cfg.qikt_moe_config.dropout = args.dropout
+        cfg.qikt_moe_config.embedding_size = args.embedding_size
+        cfg.qikt_moe_config.l2 = args.l2
     # elif args.model_name == 'mamba4kt':  # mamba4kt
     #     cfg.mamba4kt_config.dropout = args.dropout
 

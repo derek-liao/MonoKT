@@ -197,6 +197,21 @@ routerkt_config:
   dropout: 0.05
   separate_qr: False
   
+qikt_moe_config:
+  embedding_size: 64
+  dropout: 0.05
+  mlp_layer_num: 1
+  num_experts: 5
+  emb_type: 'qaid'
+  l2: 1e-5
+  num_blocks: 2
+  num_attn_heads: 8
+  d_ff: 1024
+  final_fc_dim: 512
+  final_fc_dim2: 256
+  kq_same: True
+  separate_qr: False
+
 train_config:
   wl: 0.0
   log_wandb_fold: True
