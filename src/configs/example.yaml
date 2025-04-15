@@ -231,7 +231,7 @@ train_config:
   seq_len: 100
   batch_size: 512
   eval_batch_size: 512
-  num_epochs: 300
+  num_epochs: 1000
   print_epochs: 1
   max_grad_norm: 2.0
   learning_rate: 0.001
