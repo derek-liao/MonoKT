@@ -35,6 +35,7 @@ from models.gkt_utils import get_gkt_graph
 from models.mikt import MIKT
 from models.routerkt import RouterKT
 from models.qikt_moe import QIKTMOE
+from models.atdkt import ATDKT
 # from models.mamba4kt import Mamba4KT
 from train import model_train
 from sklearn.model_selection import KFold
@@ -176,6 +177,9 @@ def main(config):
         elif model_name == 'atkt':
             model_config = config.atkt_config
             model = ATKT(num_skills, **model_config)
+        elif model_name == 'atdkt':
+            model_config = config.atdkt_config
+            model = ATDKT(num_skills, num_questions, seq_len, **model_config)
         elif model_name == 'folibikt':
             model_config = config.folibikt_config
             model = folibiKT(num_skills, num_questions, seq_len, **model_config)
@@ -493,6 +497,8 @@ if __name__ == "__main__":
         cfg.akt_config.dropout = args.dropout
     elif args.model_name == 'atkt':  # atkt
         cfg.atkt_config.dropout = args.dropout
+    elif args.model_name == 'atdkt':  # atdkt
+        cfg.atdkt_config.dropout = args.dropout
     elif args.model_name == 'folibikt':  # folibikt
         cfg.folibikt_config.l2 = args.l2
         cfg.folibikt_config.dropout = args.dropout

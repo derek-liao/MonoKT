@@ -102,6 +102,18 @@ atkt_config:
   beta: 0.2
   dropout: 0.05
 
+atdkt_config:
+  emb_size: 64
+  hidden_size: 64
+  num_attn_heads: 5
+  num_layers: 1
+  l1: 0.5
+  l2: 0.5
+  l3: 0.5
+  start: 50
+  dropout: 0.1
+  emb_type: "qid"
+
 akt_config:
   embedding_size: 64
   num_blocks: 2
