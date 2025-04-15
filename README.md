@@ -17,6 +17,7 @@
 - [✅] CAKT [15]
 - [✅] DisKT [8]
 
+```
 [1] S. Huang, Z. Liu, X. Zhao, W. Luo, and J. Weng, "Towards Robust Knowledge Tracing Models via k-Sparse Attention," in Proceedings of the 46th International ACM SIGIR Conference on Research and Development in Information Retrieval, in SIGIR '23. New York, NY, USA: Association for Computing Machinery, 2023, pp. 2441–2445. doi: 10.1145/3539618.3592073.
 [2] Z. Liu, Q. Liu, J. Chen, S. Huang, and W. Luo, "simpleKT: A Simple But Tough-to-Beat Baseline for Knowledge Tracing," Feb. 23, 2023, arXiv: arXiv:2302.06881. doi: 10.48550/arXiv.2302.06881.
 [3] Y. Cao and W. Zhang, "Mamba4KT: An Efficient and Effective Mamba-based Knowledge Tracing Model," arXiv preprint arXiv:2405.16542, 2024.
@@ -33,7 +34,7 @@
 [14] H. Zhang, Z. Liu, C. Shang, D. Li, and Y. Jiang, "A Question-centric Multi-experts Contrastive Learning Framework for Improving the Accuracy and Interpretability of Deep Sequential Knowledge Tracing Models," Mar. 12, 2024, arXiv: arXiv:2403.07322. doi: 10.48550/arXiv.2403.07322.
 [15] Zu S, Li L, Shen J. Cakt: Coupling contrastive learning with attention networks for interpretable knowledge tracing[C]//2023 International joint conference on neural networks (IJCNN). IEEE, 2023: 1-8.
 [16] Abdelrahman G, Wang Q. Knowledge tracing with sequential key-value memory networks[C]//Proceedings of the 42nd international ACM SIGIR conference on research and development in information retrieval. 2019: 175-184.
-
+```
 # Experiment Results
 
 
