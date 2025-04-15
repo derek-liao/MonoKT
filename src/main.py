@@ -36,6 +36,7 @@ from models.mikt import MIKT
 from models.routerkt import RouterKT
 from models.qikt_moe import QIKTMOE
 from models.atdkt import ATDKT
+from models.cakt import CAKT
 # from models.mamba4kt import Mamba4KT
 from train import model_train
 from sklearn.model_selection import KFold
@@ -223,6 +224,9 @@ def main(config):
         elif model_name == 'qiktmoe':
             model_config = config.qikt_moe_config
             model = QIKTMOE(num_skills, num_questions, seq_len, **model_config)
+        elif model_name == "cakt":
+            model_config = config.cakt_config
+            model = CAKT(num_skills, num_questions, **model_config)
 
         train_users = users[train_ids]
         np.random.shuffle(train_users)
@@ -522,6 +526,9 @@ if __name__ == "__main__":
         cfg.qikt_moe_config.dropout = args.dropout
         cfg.qikt_moe_config.embedding_size = args.embedding_size
         cfg.qikt_moe_config.l2 = args.l2
+    elif args.model_name == 'cakt':  # cakt
+        cfg.cakt_config.l2 = args.l2
+        cfg.cakt_config.dropout = args.dropout
     # elif args.model_name == 'mamba4kt':  # mamba4kt
     #     cfg.mamba4kt_config.dropout = args.dropout
 
