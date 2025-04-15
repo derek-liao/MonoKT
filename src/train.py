@@ -215,9 +215,7 @@ def model_train(
         total_preds = torch.cat(total_preds).squeeze(-1).detach().cpu().numpy()
         total_trues = torch.cat(total_trues).squeeze(-1).detach().cpu().numpy()
 
-    auc = roc_auc_score(y_true=total_trues, y_score=total_preds)
-    acc = accuracy_score(y_true=total_trues >= 0.5, y_pred=total_preds >= 0.5)
-    rmse = np.sqrt(mean_squared_error(y_true=total_trues, y_pred=total_preds))
+    auc, acc, rmse = calculate_metrics(total_trues, total_preds)
 
     print(
         "Best Model\tTEST AUC: {:.5f}\tTEST ACC: {:5f}\tTEST RMSE: {:5f}".format(
@@ -225,4 +223,13 @@ def model_train(
         )
     )
 
-    return test_auc, test_acc, test_rmse
+    return auc, acc, rmse
+
+def calculate_metrics(total_trues, total_preds):
+    # """Calculate AUC, ACC, RMSE metrics."""
+    auc = roc_auc_score(y_true=total_trues, y_score=total_preds)
+    acc = accuracy_score(y_true=total_trues >= 0.5, y_pred=total_preds >= 0.5)
+    rmse = np.sqrt(mean_squared_error(y_true=total_trues, y_pred=total_preds))
+    
+    return auc, acc, rmse
+

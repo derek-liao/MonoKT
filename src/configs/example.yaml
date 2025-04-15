@@ -195,9 +195,9 @@ dkt_config:
 
 routerkt_config:
   l2: 0.0001
-  balance_loss_weight: 0.001
+  balance_loss_weight: 0.0001
   num_selected_heads: 2
-  num_shared_heads: 2
+  num_shared_heads: 1
   routing_mode: "dynamic"
   embedding_size: 64
   num_blocks: 2
