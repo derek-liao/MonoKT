@@ -29,6 +29,9 @@ class CAKT(nn.Module):
         self.num_questions = num_questions
         self.l2 = l2
         self.separate_qa = separate_qa
+        self.temp = 0.05
+        self.alpha = 0.1
+        self.beta = 0.5
         embed_l = embedding_size
         
         if self.num_questions > 0:
@@ -76,7 +79,8 @@ class CAKT(nn.Module):
             nn.Dropout(self.dropout),
         )
         
-        self.loss_fn = nn.BCELoss(reduction="mean")
+        self.loss_fn = nn.BCELoss(reduction="none")
+        self.pearson = PearsonCorrelation()
         self.reset()
 
     def reset(self):
@@ -144,12 +148,30 @@ class CAKT(nn.Module):
         output_contra = self.out_constra(concat_contra).squeeze(-1)
         pred_contra = torch.sigmoid(output_contra)
 
+        # BML components
+        Q_data = torch.arange(self.num_skills).to(d_output.device)
+        out_Q = self.q_embed(Q_data)
+        Q = self.out_constra_bml(out_Q)
+        flag1 = torch.tensor(1).to(d_output.device)
+        flag0 = torch.tensor(0).to(d_output.device)
+        q_pos = Q + self.qa_embed(flag1)
+        q_neg = Q + self.qa_embed(flag0)
+
+        # Calculate Pearson correlation
+        d_output = d_output[:, :seqlength-1, :]
+        d_output1 = d_output1[:, 1:seqlength, :]
+        loss_pearson = self.pearson(d_output1, d_output)
+
         # Prepare output dictionary
         out_dict = {
             "pred": pred[:, 1:],
             "pred_contra": pred_contra[:, 1:],
             "true": r[:, 1:].float(),
             "c_reg_loss": c_reg_loss,
+            "q_pos": q_pos,
+            "q_neg": q_neg,
+            "Q": Q,
+            "loss_pearson": loss_pearson
         }
 
         return out_dict
@@ -159,16 +181,27 @@ class CAKT(nn.Module):
         pred_contra = out_dict["pred_contra"].flatten()
         true = out_dict["true"].flatten()
         c_reg_loss = out_dict["c_reg_loss"]
+        q_pos = out_dict["q_pos"]
+        q_neg = out_dict["q_neg"]
+        Q = out_dict["Q"]
+        loss_pearson = out_dict["loss_pearson"]
         
         mask = true > -1
         pred = pred[mask]
         pred_contra = pred_contra[mask]
         true = true[mask]
         
-        loss = self.loss_fn(pred, true)
-        loss_contra = self.loss_fn(pred_contra, torch.ones_like(true))
+        loss = self.loss_fn(pred, true).mean()
+        loss_contra = self.loss_fn(pred_contra, torch.ones_like(true)).mean()
         
-        total_loss = loss + loss_contra + c_reg_loss
+        # Calculate contrastive loss
+        contrastive_loss = ContrastiveLossELI5(self.num_skills, self.temp)(q_pos, q_neg)
+        
+        # Calculate BML loss
+        bml_loss = BMLLoss(self.alpha, self.beta)(q_pos, q_neg, Q)
+        
+        total_loss = loss + loss_contra + c_reg_loss + contrastive_loss + bml_loss - loss_pearson
+        
         return total_loss, len(pred), true.sum().item()
 
 class Architecture(nn.Module):
@@ -359,4 +392,75 @@ def attention_noforget(q, k, v, d_k, mask, dropout, zero_pad, gamma=None):
 
     scores = dropout(scores)
     output = torch.matmul(scores, v)
-    return output 
+    return output
+
+class ContrastiveLossELI5(nn.Module):
+    def __init__(self, batch, temperature=0.5, verbose=True):
+        super().__init__()
+        self.batch_size = batch
+        self.register_buffer("temperature", torch.tensor(temperature))
+        self.verbose = verbose
+
+    def forward(self, emb_i, emb_j):
+        """
+        emb_i and emb_j are batches of embeddings, where corresponding indices are pairs
+        z_i, z_j as per SimCLR paper
+        """
+        z_i = F.normalize(emb_i, dim=1)
+        z_j = F.normalize(emb_j, dim=1)
+
+        representations = torch.cat([z_i, z_j], dim=0)
+        similarity_matrix = F.cosine_similarity(
+            representations.unsqueeze(1), representations.unsqueeze(0), dim=2)
+
+        def l_ij(i, j):
+            sim_i_j = similarity_matrix[i, j]
+            numerator = torch.exp(sim_i_j / self.temperature)
+            one_for_not_i = torch.ones(
+                (2 * self.batch_size, )).scatter_(0, torch.tensor([i]), 0.0).to(emb_i.device)
+            denominator = torch.sum(
+                one_for_not_i *
+                torch.exp(similarity_matrix[i, :] / self.temperature)
+            )
+            loss_ij = -torch.log(numerator / denominator)
+            return loss_ij.squeeze(0)
+
+        N = self.batch_size
+        loss = 0.0
+        for k in range(0, N):
+            loss += l_ij(k, k + N) + l_ij(k + N, k)
+        return 1.0 / (2*N) * loss
+
+class BMLLoss(nn.Module):
+    def __init__(self, alpha=0.1, beta=0.5, verbose=True):
+        super().__init__()
+        self.alpha = alpha
+        self.beta = beta
+        self.verbose = verbose
+
+    def forward(self, emb_i, emb_j, emb_q):
+        """
+        emb_i: positive examples
+        emb_j: negative examples
+        emb_q: original knowledge points
+        """
+        z_i = F.normalize(emb_i, dim=1)
+        z_j = F.normalize(emb_j, dim=1)
+        z_q = F.normalize(emb_q, dim=1)
+        similarity_pos = F.cosine_similarity(z_i, z_q)
+        similarity_neg = F.cosine_similarity(z_j, z_q)
+        diag_pos = torch.diag(similarity_pos)
+        diag_neg = torch.diag(similarity_neg)
+        temp = diag_neg-diag_pos
+        loss = torch.relu(temp+self.alpha)+torch.relu(-temp-self.beta)
+        loss_bml = torch.mean(loss)
+        return loss_bml
+
+class PearsonCorrelation(nn.Module):
+    def forward(self, tensor_1, tensor_2):
+        x = tensor_1
+        y = tensor_2
+        vx = x - torch.mean(x)
+        vy = y - torch.mean(y)
+        cost = torch.sum(vx * vy) / (torch.sqrt(torch.sum(vx ** 2)) * torch.sqrt(torch.sum(vy ** 2)))
+        return cost 

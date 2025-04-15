@@ -214,7 +214,7 @@ qikt_moe_config:
   dropout: 0.05
   mlp_layer_num: 1
   num_experts: 3
-  emb_type: 'qaid'
+  emb_type: 'qid'
   l2: 1e-5
   num_blocks: 2
   num_attn_heads: 8
@@ -223,6 +223,18 @@ qikt_moe_config:
   final_fc_dim2: 256
   kq_same: True
   separate_qr: False
+
+cakt_config:
+  embedding_size: 64
+  num_blocks: 2
+  kq_same: True
+  num_attn_heads: 8
+  final_fc_dim: 512
+  d_ff: 1024
+  l2: 1e-5
+  dropout: 0.05
+  separate_qa: False
+
 
 train_config:
   wl: 0.0
@@ -244,14 +256,3 @@ train_config:
   save_epochs: 1
   save_model_name: "tmp"
   log_path: "logs"
-
-cakt_config:
-  embedding_size: 64
-  num_blocks: 2
-  kq_same: True
-  num_attn_heads: 8
-  final_fc_dim: 512
-  d_ff: 1024
-  l2: 1e-5
-  dropout: 0.05
-  separate_qa: False

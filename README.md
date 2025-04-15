@@ -1,4 +1,5 @@
 # MonoKT: a monorepo for Knowledge Tracing models
+To provide a simple and unified evaluation protocal for Knowledge Tracing models that easy to use and extend.
 ## Supported Models
 - [✅] AKT [12]
 - [✅] DKT [10]
@@ -17,6 +18,38 @@
 - [✅] CAKT [15]
 - [✅] DisKT [8]
 
+## Supported Datasets
+- [✅] Algebra05
+- [✅] Bridge06
+- [✅] Assistments09
+- [✅] Slepemapy
+- [✅] PTADisc(prob, computer, linux, database)
+- [✅] CSEDM
+- [✅] Statics
+- [✅] Spanish
+
+You can preprocess the data by running `python preprocess.py` or download the preprocessed data from [Google Drive](https://drive.google.com/drive/folders/1oiXAGB8Y5tfya3gsEfwPNx4ygstfqxvk?usp=sharing).
+
+# Experiment Settings
+
+## Default Configuration
+- Batch Size: 512
+- Sequence Length: 100 (using the most recent 100 interactions)
+
+## Dataset Processing
+We support two methods for handling sequences:
+1. **Most Recent/Early Method**: Uses the most recent/early 100 interactions, truncating earlier interactions
+2. **Stacked Dataset**: Supports the [AKT-style](https://github.com/arghosh/AKT) sequence processing where longer sequences are split based on maximum sequence length instead of being discarded
+
+# Experiment Results
+
+
+# Acknowledgement
+
+This repo is forked from [DisKT](https://github.com/zyy-2001/DisKT), which is a great repo for knowledge tracing models.
+
+
+# references
 ```
 [1] S. Huang, Z. Liu, X. Zhao, W. Luo, and J. Weng, "Towards Robust Knowledge Tracing Models via k-Sparse Attention," in Proceedings of the 46th International ACM SIGIR Conference on Research and Development in Information Retrieval, in SIGIR '23. New York, NY, USA: Association for Computing Machinery, 2023, pp. 2441–2445. doi: 10.1145/3539618.3592073.
 [2] Z. Liu, Q. Liu, J. Chen, S. Huang, and W. Luo, "simpleKT: A Simple But Tough-to-Beat Baseline for Knowledge Tracing," Feb. 23, 2023, arXiv: arXiv:2302.06881. doi: 10.48550/arXiv.2302.06881.
@@ -35,12 +68,5 @@
 [15] Zu S, Li L, Shen J. Cakt: Coupling contrastive learning with attention networks for interpretable knowledge tracing[C]//2023 International joint conference on neural networks (IJCNN). IEEE, 2023: 1-8.
 [16] Abdelrahman G, Wang Q. Knowledge tracing with sequential key-value memory networks[C]//Proceedings of the 42nd international ACM SIGIR conference on research and development in information retrieval. 2019: 175-184.
 ```
-# Experiment Results
-
-
-# Acknowledgement
-
-This repo is forked from [DisKT](https://github.com/zyy-2001/DisKT), which is a great repo for knowledge tracing models.
-
 
 
